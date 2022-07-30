@@ -38,3 +38,7 @@
 > in configs folder we have different config  file  depends on requrement in this project we have to one is `db.config.js `and `server.config.js`
 
 > index.js shoudle be the starting point of the application
+
+> ### crm application signup endPoint should be `/crm/api/v1/signup`
+> ### crm application signin endPoint should be `/crm/api/v1/signin`
+
