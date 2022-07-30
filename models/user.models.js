@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
     },
     immutable: true,
   },
-  UpdateedAt: {
+  updateedAt: {
     type: Date,
     default: () => {
       return Date.now();
