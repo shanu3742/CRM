@@ -19,7 +19,9 @@
  * password must be has for that we use bcrypt
  */
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user.models');
+const authCofig = require('../configs/auth.config');
 
 exports.signup = async (req, res) => {
   console.log('call');
@@ -69,9 +71,72 @@ exports.signup = async (req, res) => {
 
     res.status(201).send(postResponse);
   } catch (e) {
-    console.log('Error while registering user', err.message);
+    console.log('Error while registering user', e.message);
     res.status(500).send({
       message: 'Some internal server error',
+    });
+  }
+};
+
+/**
+ * signin controller
+ */
+exports.signIn = async (req, res) => {
+  try {
+    /**
+     * read the user data  from frontend
+     */
+    const userId = req.body.userId;
+    const password = req.body.password;
+
+    const userData = await User.findOne({ userId: userId });
+    /**
+     * confirm userId
+     */
+    if (!userData) {
+      return res.status(404).send({
+        message: 'user is not exists',
+      });
+    }
+    /**
+     * confirm password
+     */
+    let isValidUser = bcrypt.compareSync(password, userData.password);
+    /**
+     * userStatus approved or login
+     */
+    if (!isValidUser) {
+      return res.status(401).send({
+        message: 'please enter valid password',
+      });
+    }
+    if (userData.userStatus === 'PENDING') {
+      return res.status(400).send({
+        message: 'user is not approved',
+      });
+    }
+
+    let token = jwt.sign({ id: userData.userId }, authCofig.SECRET_KEY, {
+      expiresIn: 600,
+    });
+    let userDoc = {
+      name: userData.name,
+      email: userData.userId,
+      userType: userData.userType,
+      userStatus: userData.userStatus,
+      createdAt: userData.createdAt,
+      updatedAt: userData.updateedAt,
+      accessToken: token,
+    };
+
+    /**
+     * if user are verified
+     * read all the documents
+     */
+    res.status(200).send(userDoc);
+  } catch (e) {
+    res.status(500).send({
+      message: '500 Internal Error',
     });
   }
 };
