@@ -22,7 +22,7 @@ const isAuthenticate = (req, res, next) => {
         message: `some thing went wrong while validating token${error} `,
       });
     }
-    console.log(decode);
+    // console.log(decode);
     req.userId = decode.id;
     next();
   });
@@ -55,4 +55,32 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { isAuthenticate, isAdmin };
+const isAuthorizedUser = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findOne({ userId: userId });
+    // console.log(user);
+    if (!user) {
+      return res.status(400).send({
+        message: 'user not exists',
+      });
+    }
+    if (user.userType !== 'ADMIN' && user.userId !== req.params.userId) {
+      return res.status(401).send({
+        message: 'user not allowed',
+      });
+    }
+    if (req.body.userStatus && user.userType !== 'ADMIN') {
+      return res.status(401).send({
+        message: 'only admin allow to do this',
+      });
+    }
+    next();
+  } catch (e) {
+    res.status(500).send({
+      message: `internal server error ${e}`,
+    });
+  }
+};
+
+module.exports = { isAuthenticate, isAdmin, isAuthorizedUser };

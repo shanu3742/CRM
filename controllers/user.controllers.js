@@ -39,3 +39,35 @@ exports.findAll = async (req, res) => {
     });
   }
 };
+
+exports.update = async (req, res) => {
+  try {
+    let querryId = req.params.userId;
+    let user = await User.findOne({ userId: querryId });
+    user.name = req.body.name !== undefined ? req.body.name : user.name;
+    user.userType =
+      req.body.userType !== undefined ? req.body.userType : user.userType;
+    user.userStatus =
+      req.body.userStatus !== undefined ? req.body.userStatus : user.userStatus;
+    const updatedUser = await user.save();
+
+    res.status(200).send({
+      name: updatedUser.name,
+      userId: updatedUser.userId,
+      userStatus: updatedUser.userStatus,
+      email: updatedUser.email,
+      userType: updatedUser.userType,
+    });
+  } catch (e) {
+    res.status(500).send({
+      message: `internal server error ${e}`,
+    });
+  }
+  /**
+   * validate user is login or  not
+   */
+  /**
+   * user is admin or its  owner
+   *
+   */
+};
