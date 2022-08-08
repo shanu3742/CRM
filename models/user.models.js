@@ -28,11 +28,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     default: 'CUSTOMER',
+    enum: ['ENGINEER', 'CUSTOMER', 'ADMIN'],
   },
   userStatus: {
     type: String,
     require: true,
     default: 'APPROVED',
+    enum: ['APPROVED', 'PENDING', 'REJECTED'],
   },
   createdAt: {
     type: Date,
@@ -46,6 +48,14 @@ const userSchema = new mongoose.Schema({
     default: () => {
       return Date.now();
     },
+  },
+  ticketAssigned: {
+    type: [mongoose.SchemaTypes.ObjectId],
+    ref: 'Ticket',
+  },
+  ticketReport: {
+    type: [mongoose.SchemaTypes.ObjectId],
+    ref: 'Ticket',
   },
 });
 

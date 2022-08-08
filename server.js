@@ -29,7 +29,7 @@ db.once('open', () => {
 //  */
 require('./routes/Auth.routes')(app);
 require('./routes/user.routes')(app);
-
+require('./routes/ticket.routes')(app);
 app.listen(serverConfig.PORT, () => {
   console.log(`Server started on the port no :${serverConfig.PORT}`);
 });
