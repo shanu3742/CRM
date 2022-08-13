@@ -1,4 +1,5 @@
 const User = require('../models/user.models');
+const TicketSchema = require('../models/ticket.model');
 const verifyedTicket = async (req, res, next) => {
   try {
     if (!req.body) {
@@ -33,4 +34,32 @@ const verifyedTicket = async (req, res, next) => {
   }
 };
 
-module.exports = { verifyedTicket };
+const getTicketBasedOnuserType = async (req, res, next) => {
+  try {
+    let userId = req.userId;
+    let response;
+    let user = User.findOne({ userId: userId });
+    if (user.userStatus === 'PENDING') {
+      return res.status(401).send({
+        message: 'user is not allow to viwe ticket',
+      });
+    }
+    let querryObj;
+
+    if (user.userType === 'ADMIN') {
+      querryObj = {};
+    } else if (user.userType === 'CUSTOMER') {
+      querryObj.ticketReport = req.userId;
+    } else if (user.userType === 'ENGINEER') {
+      querryObj.$or = [{ ticketReport: req.userId }, { assigned: req.userId }];
+    }
+    response = await TicketSchema.find(querryObj);
+    req.ticket = response;
+    next();
+  } catch (e) {
+    res.status(500).send({
+      message: 'internal server error',
+    });
+  }
+};
+module.exports = { verifyedTicket, getTicketBasedOnuserType };

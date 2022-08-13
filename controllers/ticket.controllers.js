@@ -1,5 +1,10 @@
 const User = require('../models/user.models');
 const ticket = require('../models/ticket.model');
+
+/**
+ * create ticket
+ *
+ */
 exports.createTicket = async (req, res) => {
   /**
    * validate ticket
@@ -56,6 +61,28 @@ exports.createTicket = async (req, res) => {
   } catch (e) {
     return res.status(500).send({
       message: `something went wrong ${e}`,
+    });
+  }
+};
+
+/**
+ * get ticket
+ * if admin it has to show all ticket
+ * if enginner it will know about ticket reported and assign to him
+ * customer only able to see assign ticket
+ */
+
+exports.getTicket = (req, res) => {
+  try {
+    if (!req.ticket) {
+      return res.status(500).send({
+        message: 'ticket not found',
+      });
+    }
+    res.status(200).send(req.ticket);
+  } catch (e) {
+    res.status(500).send({
+      message: 'internal server error',
     });
   }
 };
